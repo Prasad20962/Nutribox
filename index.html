@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NutriBox — Fresh Fruit Boxes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg: 255, 247, 237; }
+    html, body { height: 100%; }
+    body {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(255,197,122,0.25), transparent 60%),
+        radial-gradient(1000px 500px at 100% 0%, rgba(255,115,161,0.20), transparent 60%),
+        radial-gradient(900px 700px at 20% 120%, rgba(85,230,201,0.20), transparent 60%),
+        rgb(var(--bg));
+      color: #0f172a;
+    }
+    .brand-font { font-family: Poppins, Inter, sans-serif; }
+
+    /* Pamphlet themes */
+    .theme-sunrise .pamphlet-bg { background: conic-gradient(from 200deg, #FF9A8B, #FFD08A, #F9ED69, #FF9A8B); }
+    .theme-sunrise .accent { color: #B3205F; }
+    .theme-sunrise .chip { background: rgba(255,255,255,0.8); color:#B3205F; }
+
+    .theme-tropical .pamphlet-bg { background: conic-gradient(from 0deg, #66E5A5, #00C9FF, #88F7DC, #66E5A5); }
+    .theme-tropical .accent { color: #046C4E; }
+    .theme-tropical .chip { background: rgba(255,255,255,0.85); color:#065F46; }
+
+    .theme-berry .pamphlet-bg { background: conic-gradient(from 90deg, #A78BFA, #F472B6, #60A5FA, #A78BFA); }
+    .theme-berry .accent { color: #5B21B6; }
+    .theme-berry .chip { background: rgba(255,255,255,0.85); color:#5B21B6; }
+
+    /* Print: only show pamphlet */
+    @media print {
+      body.printing { margin: 0; }
+      body.printing * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body.printing .hide-when-printing { display: none !important; }
+      body.printing #pamphletSection { display: block !important; }
+      @page { size: A4; margin: 0; }
+    }
+
+    /* Floating fruit accents motion */
+    .float-slow { animation: float 8s ease-in-out infinite; }
+    .float-medium { animation: float 6s ease-in-out infinite; }
+    .float-fast { animation: float 4.5s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+    /* Pamphlet enhanced decorations */
+    .ticket-edge {
+      background:
+        radial-gradient(12px 12px at 0 12px, transparent 11px, rgba(255,255,255,0.85) 12px) left top / 24px 24px repeat-y,
+        radial-gradient(12px 12px at 100% 12px, transparent 11px, rgba(255,255,255,0.85) 12px) right top / 24px 24px repeat-y,
+        rgba(255,255,255,0.85);
+      -webkit-mask:
+        radial-gradient(12px 12px at 0 12px, #0000 11px, #000 12px) left top / 24px 24px repeat-y,
+        radial-gradient(12px 12px at 100% 12px, #0000 11px, #000 12px) right top / 24px 24px repeat-y;
+      mask:
+        radial-gradient(12px 12px at 0 12px, #0000 11px, #000 12px) left top / 24px 24px repeat-y,
+        radial-gradient(12px 12px at 100% 12px, #0000 11px, #000 12px) right top / 24px 24px repeat-y;
+    }
+    .stamp {
+      position: relative;
+      display: inline-block;
+      padding: 10px 18px;
+      border: 2px dashed rgba(0,0,0,0.25);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.9);
+      transform: rotate(-8deg);
+      user-select: none;
+    }
+  </style>
+</head>
+<body class="relative">
+  <!-- Fruit wallpaper -->
+  <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 opacity-[0.08]">
+    <!-- Orange cluster -->
+    <svg class="absolute -top-10 -left-10 w-64 h-64 rotate-12" viewBox="0 0 64 64">
+      <circle cx="26" cy="30" r="16" fill="#FB923C"/>
+      <circle cx="40" cy="40" r="12" fill="#FDBA74"/>
+      <rect x="24" y="12" width="12" height="6" rx="3" fill="#22C55E"/>
+    </svg>
+    <!-- Grape bunch -->
+    <svg class="absolute top-16 right-6 w-56 h-56 -rotate-6" viewBox="0 0 64 64">
+      <circle cx="22" cy="22" r="8" fill="#A78BFA"/>
+      <circle cx="32" cy="22" r="8" fill="#8B5CF6"/>
+      <circle cx="18" cy="32" r="8" fill="#8B5CF6"/>
+      <circle cx="28" cy="32" r="8" fill="#7C3AED"/>
+      <circle cx="38" cy="32" r="8" fill="#8B5CF6"/>
+      <circle cx="24" cy="42" r="8" fill="#7C3AED"/>
+      <circle cx="34" cy="42" r="8" fill="#6D28D9"/>
+    </svg>
+    <!-- Apple -->
+    <svg class="absolute bottom-10 left-10 w-60 h-60 rotate-3" viewBox="0 0 64 64">
+      <path d="M40 16c-4 0-6 2-8 2s-4-2-8-2c-6 0-12 6-12 15 0 10 8 19 20 19s20-9 20-19c0-9-6-15-12-15z" fill="#22C55E"/>
+      <path d="M32 12c2-3 7-4 10-2-1 3-5 5-10 2z" fill="#16A34A"/>
+    </svg>
+    <!-- Banana arc -->
+    <svg class="absolute -bottom-10 -right-10 w-72 h-72 -rotate-12" viewBox="0 0 64 64">
+      <path d="M10 42c8 6 26 6 40-8 0 0-4 18-20 18S10 42 10 42z" fill="#FDE047"/>
+    </svg>
+  </div>
+
+  <!-- Top contact bar + Navigation -->
+  <header class="hide-when-printing sticky top-0 z-40 backdrop-blur bg-white/60 border-b border-white/30">
+    <!-- Contact strip -->
+    <div class="bg-emerald-600 text-white text-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-3">
+          <a href="tel:+917219207097" class="hover:underline">📞 7219207097</a>
+          <span class="hidden sm:inline opacity-60">|</span>
+          <a href="mailto:nutribox976@gmail.com" class="hover:underline">✉️ nutribox976@gmail.com</a>
+        </div>
+        <div class="text-white/90 text-xs sm:text-sm text-center sm:text-right">
+          Prasad Saharad Chavan • At Post Sus, Tal - Haveli, Dist - Pune
+        </div>
+      </div>
+    </div>
+    <!-- Nav -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-lime-300 to-emerald-400 grid place-items-center shadow">
+          <!-- Fruit SVG logo -->
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2c2.2 0 4 1.8 4 4 0 1.1-.9 2-2 2-.6 0-1.1-.3-1.5-.7-.4.4-.9.7-1.5.7-1.1 0-2-.9-2-2 0-2.2 1.8-4 4-4z" fill="#16a34a"/>
+            <path d="M7 10c-2.8 2.9-2.8 7.5 0 10.4 2.9 2.8 7.5 2.8 10.4 0 2.8-2.9 2.8-7.5 0-10.4S9.9 7.2 7 10z" fill="#f97316"/>
+          </svg>
+        </div>
+        <span class="brand-font text-2xl font-extrabold tracking-tight">NutriBox</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-slate-700">
+        <a href="#home" class="hover:text-emerald-600">Home</a>
+        <a href="#info" class="hover:text-emerald-600">About</a>
+        <a href="#plans" class="hover:text-emerald-600">Boxes</a>
+        <a href="#pamphletSection" class="hover:text-emerald-600">Pamphlet</a>
+        <a href="#faq" class="hover:text-emerald-600">FAQs</a>
+        <a href="#contact" class="px-3 py-1.5 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="home" class="hide-when-printing relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-24">
+      <div class="grid lg:grid-cols-2 gap-10 items-center">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/70 ring-1 ring-white/60 text-emerald-700 text-sm mb-4">
+            🥝 Fresh. 🥭 Seasonal. 🍇 Delivered.
+          </div>
+          <h1 class="brand-font text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+            Fresh fruit boxes, curated for your day
+          </h1>
+          <p class="mt-4 text-lg text-slate-700">
+            NutriBox delivers handpicked, seasonal goodness to your doorstep. Choose a plan that fits your family and routine.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="#plans" class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition shadow">
+              See Boxes & Pricing
+            </a>
+            <a href="#pamphletSection" class="px-5 py-3 rounded-xl bg-white/80 backdrop-blur ring-1 ring-slate-200 hover:bg-white transition font-semibold text-slate-800">
+              View Pamphlet
+            </a>
+          </div>
+          <p class="mt-3 text-xs text-slate-500">Demo only — no payments are processed here.</p>
+        </div>
+
+        <!-- Decorative fruit cluster -->
+        <div class="relative">
+          <div class="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-rose-300/40 blur-xl"></div>
+          <div class="absolute -bottom-8 -right-8 w-28 h-28 rounded-full bg-emerald-300/40 blur-xl"></div>
+
+          <div class="relative mx-auto max-w-md bg-white/80 backdrop-blur p-6 rounded-3xl ring-1 ring-white/60 shadow-xl">
+            <div class="grid grid-cols-3 gap-4">
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-orange-200 to-amber-200 shadow-inner float-slow">
+                <svg viewBox="0 0 64 64" class="w-full h-20">
+                  <circle cx="32" cy="36" r="18" fill="#FB923C"/>
+                  <path d="M28 16c4-2 9-2 12 0-2 4-8 4-12 0z" fill="#22C55E"/>
+                </svg>
+                <p class="text-center font-semibold text-orange-700">Citrus</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-lime-200 to-emerald-200 shadow-inner float-medium">
+                <svg viewBox="0 0 64 64" class="w-full h-20">
+                  <path d="M40 16c-4 0-6 2-8 2s-4-2-8-2c-6 0-12 6-12 15 0 10 8 19 20 19s20-9 20-19c0-9-6-15-12-15z" fill="#22C55E"/>
+                  <path d="M32 12c2-3 7-4 10-2-1 3-5 5-10 2z" fill="#16A34A"/>
+                </svg>
+                <p class="text-center font-semibold text-emerald-700">Apple</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-fuchsia-200 to-indigo-200 shadow-inner float-fast">
+                <svg viewBox="0 0 64 64" class="w-full h-20">
+                  <circle cx="28" cy="24" r="6" fill="#A78BFA"/>
+                  <circle cx="36" cy="24" r="6" fill="#8B5CF6"/>
+                  <circle cx="24" cy="32" r="6" fill="#8B5CF6"/>
+                  <circle cx="32" cy="32" r="6" fill="#7C3AED"/>
+                  <circle cx="40" cy="32" r="6" fill="#8B5CF6"/>
+                  <circle cx="28" cy="40" r="6" fill="#7C3AED"/>
+                  <circle cx="36" cy="40" r="6" fill="#6D28D9"/>
+                </svg>
+                <p class="text-center font-semibold text-indigo-700">Berries</p>
+              </div>
+            </div>
+            <p class="mt-4 text-center text-slate-600">Curated mix changes weekly. Always seasonal, always fresh.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What is NutriBox -->
+  <section id="info" class="hide-when-printing">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="col-span-2">
+          <h2 class="brand-font text-3xl md:text-4xl font-extrabold">What’s inside a Fruit Box?</h2>
+          <p class="mt-3 text-slate-700">
+            Each NutriBox is a balanced selection of ripe, ready-to-eat fruit sourced from trusted farms. Boxes are designed for households, offices, or gifting.
+          </p>
+          <div class="mt-6 grid sm:grid-cols-2 gap-4">
+            <div class="p-5 rounded-2xl bg-white/80 backdrop-blur ring-1 ring-slate-200">
+              <p class="font-semibold">Seasonal Variety</p>
+              <p class="text-slate-600">Weekly rotation of fruits to keep things exciting.</p>
+            </div>
+            <div class="p-5 rounded-2xl bg-white/80 backdrop-blur ring-1 ring-slate-200">
+              <p class="font-semibold">Quality First</p>
+              <p class="text-slate-600">Handpicked and quality-checked before packing.</p>
+            </div>
+            <div class="p-5 rounded-2xl bg-white/80 backdrop-blur ring-1 ring-slate-200">
+              <p class="font-semibold">Hygienic Packaging</p>
+              <p class="text-slate-600">Eco-friendly boxes designed to protect produce.</p>
+            </div>
+            <div class="p-5 rounded-2xl bg-white/80 backdrop-blur ring-1 ring-slate-200">
+              <p class="font-semibold">Flexible Plans</p>
+              <p class="text-slate-600">Choose weekly or monthly subscriptions as you like.</p>
+            </div>
+          </div>
+        </div>
+        <aside class="p-6 rounded-3xl bg-gradient-to-br from-emerald-500 to-lime-500 text-white shadow-lg">
+          <p class="text-sm opacity-90">Delivery Info</p>
+          <p class="mt-1 text-lg font-semibold">Free delivery on all plans</p>
+          <ul class="mt-4 space-y-2 text-white/90">
+            <li>• Weekly plans deliver once a week</li>
+            <li>• Monthly plans deliver 4 times a month</li>
+            <li>• Pause/Resume anytime</li>
+          </ul>
+          <a href="#contact" class="inline-block mt-5 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 transition">
+            Ask about delivery areas
+          </a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Plans & Pricing -->
+  <section id="plans" class="hide-when-printing">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+        <div>
+          <h2 class="brand-font text-3xl md:text-4xl font-extrabold">Choose your NutriBox</h2>
+          <p class="mt-2 text-slate-700">Three sizes. Pay weekly or monthly.</p>
+        </div>
+
+        <!-- Billing Toggle -->
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-medium text-slate-700">Billing:</span>
+          <div class="inline-flex items-center bg-white/80 backdrop-blur ring-1 ring-slate-200 rounded-full p-1">
+            <button id="toggleWeekly" class="px-3 py-1.5 rounded-full text-sm font-semibold bg-emerald-600 text-white">Weekly</button>
+            <button id="toggleMonthly" class="px-3 py-1.5 rounded-full text-sm font-semibold text-slate-700 hover:text-emerald-700">Monthly</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 grid md:grid-cols-3 gap-6">
+        <!-- Regular -->
+        <div class="rounded-3xl bg-white/80 backdrop-blur ring-1 ring-slate-200 p-6 flex flex-col">
+          <div class="flex items-center justify-between">
+            <h3 class="brand-font text-2xl font-bold">Regular Box</h3>
+            <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Best for 2–3</span>
+          </div>
+          <p class="mt-2 text-slate-600">Handy, everyday essentials.</p>
+          <div class="mt-5">
+            <span class="text-3xl font-extrabold" id="price-regular">₹699</span>
+            <span class="text-slate-600" id="unit-regular">/week</span>
+          </div>
+          <ul class="mt-5 space-y-2 text-slate-700">
+            <li>• 5 fruits + 1 sprout</li>
+            <li>• Portion: 500 gm per person</li>
+            <li>• Free delivery</li>
+          </ul>
+          <div class="mt-6 grid grid-cols-2 gap-2">
+            <button data-plan="regular" data-bill="weekly" class="choose-plan px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700">Choose Weekly</button>
+            <button data-plan="regular" data-bill="monthly" class="choose-plan px-4 py-2 rounded-xl bg-white ring-1 ring-slate-200 font-semibold hover:bg-slate-50">Choose Monthly</button>
+          </div>
+        </div>
+
+        <!-- Large -->
+        <div class="rounded-3xl bg-white/80 backdrop-blur ring-1 ring-slate-200 p-6 flex flex-col">
+          <div class="flex items-center justify-between">
+            <h3 class="brand-font text-2xl font-bold">Large Box</h3>
+            <span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Best for 3–5</span>
+          </div>
+          <p class="mt-2 text-slate-600">More for busy weeks.</p>
+          <div class="mt-5">
+            <span class="text-3xl font-extrabold" id="price-large">₹899</span>
+            <span class="text-slate-600" id="unit-large">/week</span>
+          </div>
+          <ul class="mt-5 space-y-2 text-slate-700">
+            <li>• 5 fruits + 1 sprout</li>
+            <li>• Portion: 750 gm per person</li>
+            <li>• Free delivery</li>
+          </ul>
+          <div class="mt-6 grid grid-cols-2 gap-2">
+            <button data-plan="large" data-bill="weekly" class="choose-plan px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700">Choose Weekly</button>
+            <button data-plan="large" data-bill="monthly" class="choose-plan px-4 py-2 rounded-xl bg-white ring-1 ring-slate-200 font-semibold hover:bg-slate-50">Choose Monthly</button>
+          </div>
+        </div>
+
+        <!-- Premium -->
+        <div class="rounded-3xl bg-gradient-to-b from-white/90 to-white/70 backdrop-blur ring-1 ring-slate-200 p-6 flex flex-col shadow-lg relative">
+          <span class="absolute -top-3 right-4 text-xs px-2 py-1 rounded-full bg-fuchsia-100 text-fuchsia-700">Most Popular</span>
+          <div class="flex items-center justify-between">
+            <h3 class="brand-font text-2xl font-bold">Premium Box</h3>
+            <span class="text-xs px-2 py-1 rounded-full bg-fuchsia-50 text-fuchsia-700 ring-1 ring-fuchsia-200">Best for 5+</span>
+          </div>
+          <p class="mt-2 text-slate-600">Premium variety & extras.</p>
+          <div class="mt-5">
+            <span class="text-3xl font-extrabold" id="price-premium">₹1200</span>
+            <span class="text-slate-600" id="unit-premium">/week</span>
+          </div>
+          <ul class="mt-5 space-y-2 text-slate-700">
+            <li>• 4 premium fruits + 1 protein + sprouts + dry fruits</li>
+            <li>• Portion: 1000 gm per person</li>
+            <li>• Free delivery</li>
+          </ul>
+          <div class="mt-6 grid grid-cols-2 gap-2">
+            <button data-plan="premium" data-bill="weekly" class="choose-plan px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700">Choose Weekly</button>
+            <button data-plan="premium" data-bill="monthly" class="choose-plan px-4 py-2 rounded-xl bg-white ring-1 ring-slate-200 font-semibold hover:bg-slate-50">Choose Monthly</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 text-sm text-slate-700">
+        Portions: Regular 500 gm/person · Large 750 gm/person · Premium 1000 gm/person
+      </div>
+      <div class="mt-1 text-sm text-slate-600">
+        Weekly: Regular ₹699 · Large ₹899 · Premium ₹1200 — Monthly: Regular ₹2500 · Large ₹2999 · Premium ₹4499
+      </div>
+    </div>
+  </section>
+
+  <!-- Pamphlet -->
+  <section id="pamphletSection" class="py-10 lg:py-14">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 hide-when-printing">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="brand-font text-3xl md:text-4xl font-extrabold">Pamphlet (Printable)</h2>
+          <p class="mt-2 text-slate-700">A bold, single-page flyer to print or share.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="printPamphlet" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700">Print Pamphlet</button>
+          <div class="hidden sm:flex items-center gap-2 px-2 py-1 rounded-xl bg-white/80 ring-1 ring-slate-200">
+            <span class="text-sm text-slate-600">Theme:</span>
+            <button class="theme-swatch w-6 h-6 rounded-full ring-2 ring-white shadow" data-theme="sunrise" style="background: linear-gradient(45deg,#FF9A8B,#FFD08A)"></button>
+            <button class="theme-swatch w-6 h-6 rounded-full ring-2 ring-white shadow" data-theme="tropical" style="background: linear-gradient(45deg,#00C9FF,#66E5A5)"></button>
+            <button class="theme-swatch w-6 h-6 rounded-full ring-2 ring-white shadow" data-theme="berry" style="background: linear-gradient(45deg,#A78BFA,#F472B6)"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pamphlet canvas -->
+    <div id="pamphletWrap" class="mt-6">
+      <div id="pamphlet" class="theme-sunrise mx-auto w-[min(900px,92vw)] aspect-[1/1.414] overflow-hidden rounded-[2rem] ring-1 ring-black/10 shadow-2xl relative">
+        <!-- angled color bands -->
+        <div class="absolute -left-10 -top-10 w-[160%] h-40 rotate-[-8deg] bg-white/15"></div>
+        <div class="absolute -left-10 top-10 w-[160%] h-24 rotate-[-8deg] bg-black/10 mix-blend-overlay"></div>
+        <div class="pamphlet-bg w-full h-full relative">
+          <!-- subtle emoji confetti -->
+          <div class="absolute inset-0 opacity-20 select-none pointer-events-none text-[4rem] leading-[1]">
+            <div class="absolute top-6 left-8">🍊 🍎 🍇 🥭 🍓</div>
+            <div class="absolute bottom-10 right-8 rotate-6">🍋 🍐 🍒 🫐 🍍</div>
+          </div>
+
+          <div class="relative h-full flex flex-col">
+            <!-- Header band -->
+            <div class="px-8 pt-10">
+              <div class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/85 shadow ticket-edge">
+                <div class="w-9 h-9 rounded-xl bg-white grid place-items-center">
+                  <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2c2.2 0 4 1.8 4 4 0 1.1-.9 2-2 2-.6 0-1.1-.3-1.5-.7-.4.4-.9.7-1.5.7-1.1 0-2-.9-2-2 0-2.2 1.8-4 4-4z" fill="#16a34a"/>
+                    <path d="M7 10c-2.8 2.9-2.8 7.5 0 10.4 2.9 2.8 7.5 2.8 10.4 0 2.8-2.9 2.8-7.5 0-10.4S9.9 7.2 7 10z" fill="#f97316"/>
+                  </svg>
+                </div>
+                <span class="brand-font text-2xl font-extrabold tracking-tight">NutriBox</span>
+                <span class="stamp text-emerald-700 font-bold ml-2">100% Fresh</span>
+              </div>
+              <h3 class="brand-font text-5xl md:text-6xl font-extrabold leading-[1.05] mt-6 text-white drop-shadow">Fresh Fruit Boxes</h3>
+              <p class="text-white/90 text-lg mt-2">Seasonal. Handpicked. Delivered to your door.</p>
+            </div>
+
+            <!-- Plans strip -->
+            <div class="mt-6 grid grid-cols-3 gap-4 px-8">
+              <div class="rounded-2xl bg-white/90 p-4 ring-1 ring-white/60">
+                <p class="text-xs uppercase tracking-wide text-slate-600">Regular</p>
+                <p class="brand-font text-2xl font-extrabold accent">₹699/wk</p>
+                <p class="text-sm text-slate-600">₹2500/mo</p>
+                <ul class="mt-2 text-sm text-slate-700">
+                  <li>• 5 fruits + 1 sprout</li>
+                  <li>• 500 gm per person</li>
+                  <li>• Free delivery</li>
+                </ul>
+              </div>
+              <div class="rounded-2xl bg-white/90 p-4 ring-1 ring-white/60">
+                <p class="text-xs uppercase tracking-wide text-slate-600">Large</p>
+                <p class="brand-font text-2xl font-extrabold accent">₹899/wk</p>
+                <p class="text-sm text-slate-600">₹2999/mo</p>
+                <ul class="mt-2 text-sm text-slate-700">
+                  <li>• 5 fruits + 1 sprout</li>
+                  <li>• 750 gm per person</li>
+                  <li>• Free delivery</li>
+                </ul>
+              </div>
+              <div class="rounded-2xl bg-white/90 p-4 ring-1 ring-white/60 relative overflow-hidden">
+                <span class="absolute -top-3 right-2 text-xs px-2 py-1 rounded-full bg-fuchsia-100 text-fuchsia-700 ring-1 ring-fuchsia-200">Premium</span>
+                <p class="brand-font text-2xl font-extrabold accent mt-4">₹1200/wk</p>
+                <p class="text-sm text-slate-600">₹4499/mo</p>
+                <ul class="mt-2 text-sm text-slate-700">
+                  <li>• 4 premium fruits + 1 protein + sprouts + dry fruits</li>
+                  <li>• 1000 gm per person</li>
+                  <li>• Free delivery</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Highlights row -->
+            <div class="mt-4 grid grid-cols-3 gap-4 px-8">
+              <div class="chip px-3 py-2 rounded-full text-sm font-semibold text-center">Seasonal Mix</div>
+              <div class="chip px-3 py-2 rounded-full text-sm font-semibold text-center">Quality Checked</div>
+              <div class="chip px-3 py-2 rounded-full text-sm font-semibold text-center">Eco Packaging</div>
+            </div>
+
+            <!-- Footer call -->
+            <div class="mt-auto px-8 pb-10">
+              <div class="rounded-2xl bg-white/85 p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <p class="text-slate-800"><span class="font-semibold">Subscribe weekly or monthly.</span> Free delivery. Pause anytime.</p>
+                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+                  <a href="tel:+917219207097" class="px-3 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:opacity-90">📞 7219207097</a>
+                  
+                  <span class="text-xs text-slate-700 md:ml-2">Prasad Saharad Chavan • At Post Sus, Tal - Haveli, Dist - Pune</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- wave bottom -->
+            <svg class="absolute bottom-0 left-0 w-full h-16" viewBox="0 0 1440 80" preserveAspectRatio="none">
+              <path fill="rgba(255,255,255,0.25)" d="M0,64L48,58.7C96,53,192,43,288,48C384,53,480,75,576,74.7C672,75,768,53,864,48C960,43,1056,53,1152,58.7C1248,64,1344,64,1392,64L1440,64L1440,80L1392,80C1344,80,1248,80,1152,80C1056,80,960,80,864,80C768,80,672,80,576,80C480,80,384,80,288,80C192,80,96,80,48,80L0,80Z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQs (general) -->
+  <section id="faq" class="hide-when-printing">
+    <div class="max-w-5xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
+      <h2 class="brand-font text-3xl md:text-4xl font-extrabold">FAQs</h2>
+      <div class="mt-6 grid md:grid-cols-2 gap-6">
+        <div class="p-5 rounded-2xl bg-white/80 ring-1 ring-slate-200">
+          <p class="font-semibold">Can I pause my subscription?</p>
+          <p class="text-slate-600">Yes, you can pause and resume at any time before your delivery day.</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-white/80 ring-1 ring-slate-200">
+          <p class="font-semibold">Can I swap fruits?</p>
+          <p class="text-slate-600">Tell us your preferences; we’ll swap comparable fruits where possible.</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-white/80 ring-1 ring-slate-200">
+          <p class="font-semibold">What’s in each box?</p>
+          <p class="text-slate-600">Regular & Large: 5 fruits + 1 sprout. Premium: 4 premium fruits + 1 protein + sprouts + dry fruits.</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-white/80 ring-1 ring-slate-200">
+          <p class="font-semibold">Delivery charges?</p>
+          <p class="text-slate-600">Free delivery on all plans within our service areas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact / Request Subscription -->
+  <section id="contact" class="hide-when-printing">
+    <div class="max-w-5xl mx-auto px-6 lg:px-8 pb-16">
+      <div class="rounded-3xl bg-white/80 ring-1 ring-slate-200 p-6 md:p-8">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h3 class="brand-font text-2xl font-extrabold">Request a Subscription</h3>
+            <p class="text-slate-600 mt-1">We’ll confirm details by email or WhatsApp.</p>
+          </div>
+          <span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800">Demo form</span>
+        </div>
+
+        <!-- Where requests go -->
+        <div class="mt-4 p-4 rounded-2xl bg-emerald-50 text-emerald-800">
+          Where do requests go? Submissions open your email app to nutribox976@gmail.com or WhatsApp chat to 7219207097 with all details. You’ll also see a confirmation here.
+        </div>
+
+        <form id="contactForm" class="mt-6 grid md:grid-cols-2 gap-4">
+          <div>
+            <label for="nameInput" class="block text-sm font-medium text-slate-700">Full Name</label>
+            <input id="nameInput" required type="text" class="mt-1 w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 focus:ring-emerald-500 outline-none bg-white" />
+          </div>
+          <div>
+            <label for="emailInput" class="block text-sm font-medium text-slate-700">Email</label>
+            <input id="emailInput" required type="email" placeholder="you@example.com" class="mt-1 w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 focus:ring-emerald-500 outline-none bg-white" />
+          </div>
+          <div>
+            <label for="areaInput" class="block text-sm font-medium text-slate-700">Area/City</label>
+            <input id="areaInput" required type="text" class="mt-1 w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 focus:ring-emerald-500 outline-none bg-white" />
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="contactPlan" class="block text-sm font-medium text-slate-700">Plan</label>
+              <select id="contactPlan" class="mt-1 w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 bg-white">
+                <option value="Regular Box">Regular Box</option>
+                <option value="Large Box">Large Box</option>
+                <option value="Premium Box">Premium Box</option>
+              </select>
+            </div>
+            <div>
+              <label for="contactBilling" class="block text-sm font-medium text-slate-700">Billing</label>
+              <select id="contactBilling" class="mt-1 w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 bg-white">
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="dateInput" class="block text-sm font-medium text-slate-700">Start Date</label>
+            <input id="dateInput" required type="date" class="mt-1 w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 focus:ring-emerald-500 outline-none bg-white" />
+          </div>
+          <div class="md:col-span-2">
+            <label for="notesInput" class="block text-sm font-medium text-slate-700">Notes (optional)</label>
+            <textarea id="notesInput" rows="3" class="mt-1 w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 focus:ring-emerald-500 outline-none bg-white" placeholder="Any fruit preferences?"></textarea>
+          </div>
+          <div class="md:col-span-2 flex flex-wrap items-center gap-3 pt-2">
+            <button id="sendWhatsAppBtn" type="button" class="px-5 py-3 rounded-xl bg-[#25D366] text-white font-semibold hover:brightness-95">Send via WhatsApp</button>
+            <p class="text-xs text-slate-500">We’ll open WhatsApp with your message.</p>
+          </div>
+        </form>
+
+        <div class="mt-6 grid md:grid-cols-3 gap-4">
+          <!-- Contact Card -->
+          <div class="col-span-1 p-5 rounded-2xl bg-white ring-1 ring-slate-200">
+            <p class="font-semibold">Business Contact</p>
+            <p class="mt-2 text-slate-700">Prasad Saharad Chavan</p>
+            <a href="tel:+917219207097" class="mt-2 inline-block px-3 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">📞 7219207097</a>
+            <a href="mailto:nutribox976@gmail.com" class="mt-2 inline-block px-3 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:opacity-90">✉️ nutribox976@gmail.com</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=At%20Post%20Sus%2C%20Tal%20-%20Haveli%2C%20Dist%20-%20Pune" target="_blank" rel="noopener noreferrer" class="mt-2 inline-block px-3 py-2 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600">📍 View on Maps</a>
+            <p class="mt-2 text-slate-600">At Post Sus, Tal - Haveli, Dist - Pune</p>
+          </div>
+
+          <!-- Success message -->
+          <div id="contactSuccess" class="col-span-2 hidden p-5 rounded-2xl bg-emerald-50 text-emerald-800">
+            Thanks! We prepared your message. Please review and send it.
+          </div>
+        </div>
+
+        <!-- FAQ right after the form (as requested) -->
+        <div class="mt-8">
+          <h4 class="brand-font text-xl font-extrabold">Quick FAQs</h4>
+          <div class="mt-4 grid md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-white/80 ring-1 ring-slate-200">
+              <p class="font-semibold">What’s in each box?</p>
+              <p class="text-slate-600 mt-1">Regular & Large: 5 fruits + 1 sprout. Premium: 4 premium fruits + 1 protein + sprouts + dry fruits.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-white/80 ring-1 ring-slate-200">
+              <p class="font-semibold">How much per person?</p>
+              <p class="text-slate-600 mt-1">Regular 500 gm · Large 750 gm · Premium 1000 gm per person.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="hide-when-printing border-t border-white/50">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8 text-slate-700 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p>© <span id="year"></span> NutriBox. All rights reserved.</p>
+      <div class="text-sm">Made with fresh vibes 🥝</div>
+    </div>
+  </footer>
+
+  <!-- Modal: Plan Selection -->
+  <div id="planModal" class="hide-when-printing fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-slate-900/50"></div>
+    <div class="relative max-w-lg mx-auto mt-24 bg-white rounded-3xl p-6 ring-1 ring-slate-200 shadow-xl">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="brand-font text-2xl font-extrabold" id="modalPlanName">Plan</h3>
+          <p class="text-slate-600" id="modalBilling">Weekly</p>
+        </div>
+        <button id="closeModal" class="p-2 rounded-xl hover:bg-slate-100">✕</button>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-baseline gap-2">
+          <span class="text-3xl font-extrabold" id="modalPrice">₹699</span>
+          <span class="text-slate-600" id="modalUnit">/week</span>
+        </div>
+        <p class="text-slate-600 mt-1">Free delivery • Pause anytime</p>
+      </div>
+
+      <form id="modalForm" class="mt-5 grid grid-cols-1 gap-3">
+        <input id="modalName" required type="text" placeholder="Full Name" class="w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 focus:ring-emerald-500 outline-none bg-white" />
+        <input id="modalEmail" required type="email" placeholder="Email" class="w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 focus:ring-emerald-500 outline-none bg-white" />
+        <input id="modalArea" required type="text" placeholder="Area/City" class="w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 focus:ring-emerald-500 outline-none bg-white" />
+        <input id="modalDate" required type="date" class="w-full px-3 py-2 rounded-xl ring-1 ring-slate-300 focus:ring-emerald-500 outline-none bg-white" />
+        
+        <div class="grid grid-cols-1 gap-2">
+          <button id="modalSendWhatsApp" type="button" class="px-5 py-3 rounded-xl bg-[#25D366] text-white font-semibold hover:brightness-95">Send via WhatsApp</button>
+        </div>
+        <p class="text-xs text-slate-500">We’ll open WhatsApp with your message.</p>
+      </form>
+
+      <div id="modalSuccess" class="hidden mt-4 p-4 rounded-2xl bg-emerald-50 text-emerald-800">
+        Great! Your request is prepared. Please send the message.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data and state
+    const plans = {
+      regular: { name: 'Regular Box', weekly: 699, monthly: 2500, portion: '500 gm per person', items: '5 fruits + 1 sprout' },
+      large:   { name: 'Large Box',   weekly: 899, monthly: 2999, portion: '750 gm per person', items: '5 fruits + 1 sprout' },
+      premium: { name: 'Premium Box', weekly: 1200, monthly: 4499, portion: '1000 gm per person', items: '4 premium fruits + 1 protein + sprouts + dry fruits' }
+    };
+    let billing = 'weekly';
+
+    // Elements for prices
+    const priceEls = {
+      regular: { price: document.getElementById('price-regular'), unit: document.getElementById('unit-regular') },
+      large:   { price: document.getElementById('price-large'),   unit: document.getElementById('unit-large') },
+      premium: { price: document.getElementById('price-premium'), unit: document.getElementById('unit-premium') }
+    };
+    const toggleWeekly = document.getElementById('toggleWeekly');
+    const toggleMonthly = document.getElementById('toggleMonthly');
+
+    function formatCurrency(v) { return '₹' + v.toLocaleString('en-IN'); }
+
+    function renderPrices() {
+      ['regular','large','premium'].forEach(key => {
+        priceEls[key].price.textContent = formatCurrency(plans[key][billing]);
+        priceEls[key].unit.textContent = billing === 'weekly' ? '/week' : '/month';
+      });
+      if (billing === 'weekly') {
+        toggleWeekly.className = 'px-3 py-1.5 rounded-full text-sm font-semibold bg-emerald-600 text-white';
+        toggleMonthly.className = 'px-3 py-1.5 rounded-full text-sm font-semibold text-slate-700 hover:text-emerald-700';
+      } else {
+        toggleMonthly.className = 'px-3 py-1.5 rounded-full text-sm font-semibold bg-emerald-600 text-white';
+        toggleWeekly.className = 'px-3 py-1.5 rounded-full text-sm font-semibold text-slate-700 hover:text-emerald-700';
+      }
+    }
+    toggleWeekly.addEventListener('click', () => { billing = 'weekly'; renderPrices(); });
+    toggleMonthly.addEventListener('click', () => { billing = 'monthly'; renderPrices(); });
+    renderPrices();
+
+    // Modal open/close
+    const modal = document.getElementById('planModal');
+    const modalPlanName = document.getElementById('modalPlanName');
+    const modalBilling = document.getElementById('modalBilling');
+    const modalPrice = document.getElementById('modalPrice');
+    const modalUnit = document.getElementById('modalUnit');
+    const modalForm = document.getElementById('modalForm');
+    const modalSuccess = document.getElementById('modalSuccess');
+    const closeModalBtn = document.getElementById('closeModal');
+    const modalSendWhatsApp = document.getElementById('modalSendWhatsApp');
+
+    function openModal(planKey, billKey) {
+      const plan = plans[planKey];
+      modalForm.dataset.planKey = planKey;
+      modalForm.dataset.billKey = billKey;
+      modalPlanName.textContent = plan.name;
+      modalBilling.textContent = billKey === 'weekly' ? 'Weekly' : 'Monthly';
+      modalPrice.textContent = formatCurrency(plan[billKey]);
+      modalUnit.textContent = billKey === 'weekly' ? '/week' : '/month';
+      modal.classList.remove('hidden');
+      modalSuccess.classList.add('hidden');
+      // do not reset values the user is typing into; only if new open:
+      modalForm.reset();
+    }
+    function closeModal() { modal.classList.add('hidden'); }
+
+    document.querySelectorAll('.choose-plan').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const planKey = e.currentTarget.getAttribute('data-plan');
+        const billKey = e.currentTarget.getAttribute('data-bill');
+        openModal(planKey, billKey);
+      });
+    });
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    // Helpers: open email / whatsapp
+    /* email option removed per your request */
+    function openWhatsApp(number, message) {
+      const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    }
+
+    // Build message text
+    function buildMessage({ name, email, area, planName, bill, date, price, items, portion }) {
+      return (
+        `NutriBox Subscription Request` + '\n' +
+        `Name: ${name}` + '\n' +
+        `Email: ${email}` + '\n' +
+        `Area/City: ${area}` + '\n' +
+        `Plan: ${planName}` + '\n' +
+        `Billing: ${bill}` + '\n' +
+        `Start Date: ${date}` + '\n' +
+        `Price: ${formatCurrency(price)}` + '\n' +
+        `Contents: ${items}` + '\n' +
+        `Portion: ${portion}`
+      );
+    }
+
+    // Modal form submit -> email draft
+    modalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const planKey = modalForm.dataset.planKey || 'regular';
+      const billKey = modalForm.dataset.billKey || 'weekly';
+      const plan = plans[planKey];
+
+      const name = document.getElementById('modalName').value.trim();
+      const email = document.getElementById('modalEmail').value.trim();
+      const area = document.getElementById('modalArea').value.trim();
+      const date = document.getElementById('modalDate').value;
+
+      const body = buildMessage({
+        name, email, area, planName: plan.name,
+        bill: billKey === 'weekly' ? 'Weekly' : 'Monthly',
+        date, price: plan[billKey], items: plan.items, portion: plan.portion
+      });
+
+      openWhatsApp('917219207097', body);
+      modalSuccess.classList.remove('hidden');
+    });
+
+    // Modal WhatsApp button
+    modalSendWhatsApp.addEventListener('click', () => {
+      const planKey = modalForm.dataset.planKey || 'regular';
+      const billKey = modalForm.dataset.billKey || 'weekly';
+      const plan = plans[planKey];
+
+      const name = document.getElementById('modalName').value.trim() || '-';
+      const email = document.getElementById('modalEmail').value.trim() || '-';
+      const area = document.getElementById('modalArea').value.trim() || '-';
+      const date = document.getElementById('modalDate').value || '-';
+
+      const message = buildMessage({
+        name, email, area, planName: plan.name,
+        bill: billKey === 'weekly' ? 'Weekly' : 'Monthly',
+        date, price: plan[billKey], items: plan.items, portion: plan.portion
+      });
+      openWhatsApp('917219207097', message);
+      modalSuccess.classList.remove('hidden');
+    });
+
+    // Contact form actions
+    const contactForm = document.getElementById('contactForm');
+    const contactSuccess = document.getElementById('contactSuccess');
+    const sendEmailBtn = document.getElementById('sendEmailBtn');
+    const sendWhatsAppBtn = document.getElementById('sendWhatsAppBtn');
+
+    function collectContactForm() {
+      const name = document.getElementById('nameInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim();
+      const area = document.getElementById('areaInput').value.trim();
+      const planSel = document.getElementById('contactPlan').value;
+      const bill = document.getElementById('contactBilling').value;
+      const date = document.getElementById('dateInput').value;
+      const notes = document.getElementById('notesInput').value.trim();
+
+      const key = planSel.toLowerCase().includes('premium') ? 'premium' :
+                  planSel.toLowerCase().includes('large') ? 'large' : 'regular';
+      const price = plans[key][bill.toLowerCase()];
+      const items = plans[key].items;
+      const portion = plans[key].portion;
+
+      const subject = `Subscription request — ${planSel} (${bill})`;
+      const body = buildMessage({
+        name, email, area, planName: planSel, bill, date, price, items, portion
+      }) + (notes ? `\nNotes: ${notes}` : '');
+
+      return { subject, body };
+    }
+
+    /* email button removed per your request */
+
+    sendWhatsAppBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const { body } = collectContactForm();
+      openWhatsApp('917219207097', body);
+      contactSuccess.classList.remove('hidden');
+    });
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Pamphlet theme switching
+    const pamphlet = document.getElementById('pamphlet');
+    document.querySelectorAll('.theme-swatch').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = btn.getAttribute('data-theme');
+        pamphlet.classList.remove('theme-sunrise','theme-tropical','theme-berry');
+        pamphlet.classList.add('theme-' + t);
+      });
+    });
+
+    // Print only the pamphlet
+    const printBtn = document.getElementById('printPamphlet');
+    printBtn.addEventListener('click', () => {
+      document.body.classList.add('printing');
+      setTimeout(() => {
+        window.print();
+        setTimeout(() => document.body.classList.remove('printing'), 300);
+      }, 50);
+    });
+
+    // Smooth scroll for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+          e.preventDefault();
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'982a50d900d46ec2',t:'MTc1ODQ2NTYwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
